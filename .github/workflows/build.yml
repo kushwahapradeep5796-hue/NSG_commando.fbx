@@ -1,0 +1,23 @@
+name: GLB to FBX
+on: [push]
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: sudo apt-get update && sudo apt-get install -y blender
+      - name: Convert GLB to FBX
+        run: |
+          echo "import bpy, glob, os
+          f = glob.glob('*.glb')[0]
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          bpy.ops.import_scene.gltf(filepath=f)
+          bpy.ops.export_scene.fbx(filepath='nsg_commando.fbx')
+          print('Done')" > convert.py
+          blender --background --python convert.py
+      - name: Upload FBX
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsg-fbx
+          path: nsg_commando.fbx
