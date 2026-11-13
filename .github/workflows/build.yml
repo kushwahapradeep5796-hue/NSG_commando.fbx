@@ -9,13 +9,17 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y blender
       - name: Convert GLB to FBX
         run: |
-          echo "import bpy, glob, os
+          cat > convert.py << 'PYEOF'
+          import bpy, glob
           f = glob.glob('*.glb')[0]
+          print("Found:", f)
           bpy.ops.wm.read_factory_settings(use_empty=True)
           bpy.ops.import_scene.gltf(filepath=f)
           bpy.ops.export_scene.fbx(filepath='nsg_commando.fbx')
-          print('Done')" > convert.py
+          print("Done")
+          PYEOF
           blender --background --python convert.py
+          ls -lh
       - name: Upload FBX
         uses: actions/upload-artifact@v4
         with:
